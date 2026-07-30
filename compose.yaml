@@ -26,7 +26,7 @@ services:
       KAFKA_SHARE_COORDINATOR_STATE_TOPIC_MIN_ISR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
-      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
     healthcheck:
       test:
         - CMD-SHELL
@@ -39,7 +39,7 @@ services:
       retries: 20
       start_period: 15s
     volumes:
-      - kafka_data:/tmp/kraft-combined-logs
+      - kafka_data:/var/lib/kafka/data
 
   topic-init:
     image: apache/kafka:${KAFKA_VERSION:-4.3.1}
@@ -53,6 +53,18 @@ services:
       - ./config:/config:ro
       - ./scripts:/scripts:ro
     restart: "no"
+
+  kafbat-ui:
+    image: ghcr.io/kafbat/kafka-ui:${KAFBAT_UI_VERSION:-v1.5.0}
+    ports:
+      - "127.0.0.1:${KAFBAT_UI_HOST_PORT:-8080}:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker:19092
+    depends_on:
+      topic-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
 
   postgres:
     image: postgres:${POSTGRES_VERSION:-18.4}
