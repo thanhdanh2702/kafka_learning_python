@@ -13,7 +13,7 @@ clean:
 	docker compose --env-file .env down -v
 
 logs:
-	docker compose --env-file .env logs -f broker app
+	docker compose --env-file .env logs -f broker kafbat-ui app
 
 topics:
 	docker compose --env-file .env exec broker \

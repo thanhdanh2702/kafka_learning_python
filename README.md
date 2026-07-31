@@ -26,6 +26,9 @@ make topics
 `topic-init` kết thúc với trạng thái `Exited (0)` là bình thường. Service này chỉ
 tạo topic một lần rồi dừng.
 
+Kafbat UI có tại [http://localhost:8080](http://localhost:8080). Nếu thay đổi
+`KAFBAT_UI_HOST_PORT` trong `.env`, hãy dùng port tương ứng.
+
 ## Quy tắc học
 
 1. Mở `PROJECT_STRUCTURE.md` để tìm file của stage đang học.
