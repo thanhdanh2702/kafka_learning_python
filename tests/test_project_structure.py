@@ -62,25 +62,17 @@ class ProjectStructureTest(unittest.TestCase):
                 self.assertTrue(file_path.is_file())
                 self.assertTrue(file_path.read_text(encoding="utf-8").strip())
 
-    def test_python_implementation_files_exist_and_are_empty(self):
+    def test_python_implementation_files_exist(self):
         for relative_path in IMPLEMENTATION_FILES:
             with self.subTest(path=relative_path):
                 file_path = PROJECT_ROOT / relative_path
                 self.assertTrue(file_path.is_file())
-                self.assertEqual(
-                    file_path.read_text(encoding="utf-8").strip(),
-                    "",
-                )
 
-    def test_sql_implementation_files_exist_and_are_empty(self):
+    def test_sql_implementation_files_exist(self):
         for relative_path in SQL_IMPLEMENTATION_FILES:
             with self.subTest(path=relative_path):
                 file_path = PROJECT_ROOT / relative_path
                 self.assertTrue(file_path.is_file())
-                self.assertEqual(
-                    file_path.read_text(encoding="utf-8").strip(),
-                    "",
-                )
 
 
 if __name__ == "__main__":
