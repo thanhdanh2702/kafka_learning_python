@@ -18,7 +18,7 @@ python3 -m unittest tests.stage_05_scaling.test_load_generator -v
 
 ## GREEN evidence
 
-After the fix, all 5 Stage 5 tests passed. The full project suite passed 21 tests
+After the fix, all 5 Stage 5 tests passed. The full project suite passed 23 tests
 with no failures.
 
 | Guarantee | Test | Result |
