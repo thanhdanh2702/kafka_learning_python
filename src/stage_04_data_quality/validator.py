@@ -1,5 +1,7 @@
 import json
 import os
+from datetime import datetime
+from uuid import UUID
 
 from confluent_kafka import Consumer, Producer
 
@@ -28,14 +30,46 @@ def validate(event, message_key):
     missing = REQUIRED_FIELDS - event.keys()
     if missing:
         raise ValueError(f"missing_fields={sorted(missing)}")
-    if event["event_type"] != "OrderCreated" or event["event_version"] != 1:
-        raise ValueError("unsupported_event")
+
+    if event["event_type"] != "OrderCreated":
+        raise ValueError("unsupported_event_type")
+
+    if type(event["event_version"]) is not int or event["event_version"] != 1:
+        raise ValueError("unsupported_event_version")
+
+    if not isinstance(event["event_id"], str):
+        raise ValueError("event_id_must_be_a_string")
+    try:
+        UUID(event["event_id"])
+    except ValueError as error:
+        raise ValueError("event_id_must_be_a_valid_uuid") from error
+
+    if not isinstance(event["order_id"], str) or not event["order_id"].strip():
+        raise ValueError("invalid_order_id")
     if message_key != event["order_id"]:
         raise ValueError("message_key_must_equal_order_id")
-    if not isinstance(event["amount"], (int, float)) or event["amount"] < 0:
-        raise ValueError("invalid_amount")
+
+    if not isinstance(event["customer_id"], str) or not event["customer_id"].strip():
+        raise ValueError("invalid_customer_id")
+
+    if (
+        isinstance(event["amount"], bool)
+        or not isinstance(event["amount"], (int, float))
+        or event["amount"] <= 0
+    ):
+        raise ValueError("amount_must_be_greater_than_zero")
+
     if event["currency"] != "VND":
         raise ValueError("unsupported_currency")
+
+    if not isinstance(event["occurred_at"], str):
+        raise ValueError("occurred_at_must_be_a_string")
+    try:
+        occurred_at = datetime.fromisoformat(event["occurred_at"])
+    except ValueError as error:
+        raise ValueError("occurred_at_must_be_iso_datetime") from error
+    if occurred_at.tzinfo is None or occurred_at.utcoffset() is None:
+        raise ValueError("occurred_at_must_include_timezone")
 
 
 def main():
