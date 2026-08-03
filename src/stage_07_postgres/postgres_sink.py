@@ -1,10 +1,12 @@
 import json
 import os
 import signal
-from datetime import datetime
+from datetime import datetime, UTC
+import uuid
 from decimal import Decimal
 
 import psycopg
+from psycopg.types.json import Jsonb
 from confluent_kafka import Consumer
 
 
@@ -79,6 +81,35 @@ def store_event(connection, event):
                 revenue = daily_order_metrics.revenue + EXCLUDED.revenue
             """,
             (metric_date, Decimal(str(event["amount"]))),
+        )
+
+        outbox_id = uuid.uuid4()
+
+        state_event = {
+            "event_id": str(outbox_id),
+            "event_type": "OrderStored",
+            "event_version": 1,
+            "occurred_at": datetime.now(UTC).isoformat(),
+            "order_id": event["order_id"],
+            "status": "STORED"
+        }
+
+        connection.execute(
+            """
+            INSERT INTO outbox_events (
+                id,
+                aggregate_id,
+                event_type,
+                payload
+            )
+            VALUES(%s, %s, %s, %s)
+            """,
+            (
+                outbox_id,
+                event["order_id"],
+                "OrderStored",
+                Jsonb(state_event)
+            )
         )
 
     return "STORED"
