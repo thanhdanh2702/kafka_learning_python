@@ -51,6 +51,7 @@ SQL_IMPLEMENTATION_FILES = {
     "sql/migrations/002_create_processed_events.sql",
     "sql/migrations/003_create_daily_metrics.sql",
     "sql/migrations/004_create_outbox.sql",
+    "sql/migrations/005_create_window_metrics.sql",
 }
 
 
